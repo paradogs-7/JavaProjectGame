@@ -9,9 +9,9 @@ public class PlayerMovement extends KeyAdapter {
     private JLabel player;
     private JPanel panel;
     private int worldWidth, worldHeight;
-    private int speed = 3; // Karakterin varsayılan hızı
-    private Set<Integer> activeKeys; // Aktif tuşları takip etmek için
-    private List<GameObjectWrapper> obstacles; // Çarpışma kontrolü için engeller listesi
+    private int speed = 3;
+    private Set<Integer> activeKeys;
+    private List<GameObjectWrapper> obstacles;
 
     public PlayerMovement(JLabel player, JPanel panel, int worldWidth, int worldHeight, List<GameObjectWrapper> obstacles) {
         this.player = player;
@@ -21,7 +21,6 @@ public class PlayerMovement extends KeyAdapter {
         this.obstacles = obstacles;
         activeKeys = new HashSet<>();
 
-        // Zamanlayıcı: Tuşlar basılıyken hareketi sürekli gerçekleştirir
         Timer movementTimer = new Timer(10, e -> movePlayer());
         movementTimer.start();
     }
@@ -57,10 +56,9 @@ public class PlayerMovement extends KeyAdapter {
             nextX += speed; // Sağa hareket
         }
 
-        // Çarpışma kontrolü için yeni sınırları belirle
         Rectangle nextBounds = new Rectangle(nextX, nextY, player.getWidth(), player.getHeight());
         for (GameObjectWrapper obstacleWrapper : obstacles) {
-            if (nextBounds.intersects(obstacleWrapper.object.getBounds())) {
+            if ( !obstacleWrapper.object.isKey() && nextBounds.intersects(obstacleWrapper.object.getBounds())) {
                 // Çarpışma varsa yönleri sıfırla
                 if (activeKeys.contains(KeyEvent.VK_UP) || activeKeys.contains(KeyEvent.VK_W)) {
                     nextY = currentY;
@@ -78,10 +76,10 @@ public class PlayerMovement extends KeyAdapter {
         }
 
         // Pozisyonun dünya sınırlarının dışına çıkmasını engelle
-        if (nextX < 0) nextX = 0; // Sol sınır
-        if (nextY < 0) nextY = 0; // Üst sınır
-        if (nextX + player.getWidth() > worldWidth) nextX = worldWidth - player.getWidth(); // Sağ sınır
-        if (nextY + player.getHeight() > worldHeight) nextY = worldHeight - player.getHeight(); // Alt sınır
+        if (nextX < 0) nextX = 0;
+        if (nextY < 0) nextY = 0;
+        if (nextX + player.getWidth() > worldWidth) nextX = worldWidth - player.getWidth();
+        if (nextY + player.getHeight() > worldHeight) nextY = worldHeight - player.getHeight();
 
         // Yeni pozisyonu ayarla
         player.setLocation(nextX, nextY);

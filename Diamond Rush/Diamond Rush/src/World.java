@@ -6,12 +6,11 @@ public class World {
     private JFrame frame;
     private JPanel levelPanel;
     private JLabel player;
-
     private Camera camera;
-    private int worldWidth = 10800; // Oyun dünyası genişliği
-    private int worldHeight = 1080; // Oyun dünyası yüksekliği
-
-    private ArrayList<GameObjectWrapper> objects; // Objeleri tutan liste
+    private int worldWidth = 10800;
+    private int worldHeight = 1080;
+    private ArrayList<GameObjectWrapper> objects;
+    private boolean keyAcquired = false; // Anahtarın alınıp alınmadığını tutar
 
     public World() {
         frame = new JFrame("Diamond Rush - Level 1");
@@ -22,7 +21,7 @@ public class World {
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         gd.setFullScreenWindow(frame);
 
-        objects = new ArrayList<>(); // Objeler listesi
+        objects = new ArrayList<>(); // Obje listesi
 
         levelPanel = new JPanel() {
             @Override
@@ -42,10 +41,11 @@ public class World {
         camera = new Camera(screenSize.width, screenSize.height, worldWidth, worldHeight);
 
         addPlayer();
-        addObject(0, 50, 50, 764, new Color(21, 64, 77), "Obstacle");
-        addObject(0, 0, 10800, 50, new Color(21, 64, 77), "Obstacle");
-        addObject(0, 814, 10800, 50, new Color(21, 64, 77), "Obstacle");
-        addObject(400, 500, 99, 50, new Color(21, 64, 77), "Obstacle");
+        addKey(1000, 500); // Anahtarı ekle
+        addObject(0, 50, 50, 764, new Color(21, 64, 77), "Obstacle", false);
+        addObject(0, 0, 10800, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(0, 814, 10800, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(400, 500, 99, 50, new Color(21, 64, 77), "Obstacle", false);
 
         PlayerMovement playerMovement = new PlayerMovement(player, levelPanel, worldWidth, worldHeight, objects);
         levelPanel.addKeyListener(playerMovement);
@@ -55,11 +55,25 @@ public class World {
 
         Timer timer = new Timer(16, e -> {
             updateCamera();
+            checkKeyCollision(); // Anahtar çarpışmasını kontrol et
         });
         timer.start();
 
         frame.pack();
         frame.setVisible(true);
+    }
+
+
+    private void addKey(int x, int y) {
+        JLabel keyLabel = new JLabel(); // Label oluştur
+
+        keyLabel.setOpaque(true);
+        keyLabel.setBackground(Color.YELLOW); // Anahtarı sarı yap
+
+        keyLabel.setBounds(x, y, 35, 35);
+        GameObject keyObject = new GameObject("key", x, y, 35, 35, true); // Yeni anahtar objesi
+        objects.add(new GameObjectWrapper(keyLabel,keyObject));
+        levelPanel.add(keyLabel);
     }
 
     private void addPlayer() {
@@ -70,15 +84,14 @@ public class World {
         levelPanel.add(player);
     }
 
-    private void addObject(int x, int y, int width, int height, Color color, String name) {
+    private void addObject(int x, int y, int width, int height, Color color, String name, boolean isKey) {
         JLabel newLabel = new JLabel();
         newLabel.setOpaque(true);
         newLabel.setBackground(color);
         newLabel.setBounds(x, y, width, height);
 
-        GameObject newObject = new GameObject(name, x, y, width, height);
+        GameObject newObject = new GameObject(name, x, y, width, height, isKey);
         objects.add(new GameObjectWrapper(newLabel, newObject));
-
         levelPanel.add(newLabel);
     }
 
@@ -92,6 +105,24 @@ public class World {
         int y = Math.max(0, Math.min(camera.getY(), worldHeight - cameraHeight));
 
         levelPanel.setLocation(-x, -y);
+    }
+
+    private void checkKeyCollision() {
+        if (keyAcquired) return; // Anahtar zaten alındıysa kontrol yapma
+
+        Rectangle playerBounds = player.getBounds();
+
+        for (GameObjectWrapper objectWrapper : objects) {
+            if (objectWrapper.object.isKey() && playerBounds.intersects(objectWrapper.object.getBounds())) {
+                keyAcquired = true; // Anahtarı aldık
+                levelPanel.removeAll(); // Tüm bileşenleri temizle
+                levelPanel.add(player);  // Oyuncuyu ekle
+                levelPanel.revalidate();
+                levelPanel.repaint();
+                System.out.println("Key acquired!");
+                break; // Çarpışmayı bulduktan sonra döngüyü bitir
+            }
+        }
     }
 
     public static void main(String[] args) {
