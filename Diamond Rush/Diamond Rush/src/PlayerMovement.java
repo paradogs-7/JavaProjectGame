@@ -1,22 +1,24 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class PlayerMovement extends KeyAdapter {
-    private JLabel player; // Oyuncunun JLabel temsilcisi
-    private JPanel panel; // Oyun paneli
-    private int worldWidth, worldHeight; // Oyun dünyasının boyutları
+    private JLabel player;
+    private JPanel panel;
+    private int worldWidth, worldHeight;
     private int speed = 3; // Karakterin varsayılan hızı
     private Set<Integer> activeKeys; // Aktif tuşları takip etmek için
+    private List<GameObjectWrapper> obstacles; // Çarpışma kontrolü için engeller listesi
 
-    public PlayerMovement(JLabel player, JPanel panel, int worldWidth, int worldHeight) {
+    public PlayerMovement(JLabel player, JPanel panel, int worldWidth, int worldHeight, List<GameObjectWrapper> obstacles) {
         this.player = player;
         this.panel = panel;
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
-
-        // Aktif tuşları takip etmek için Set
+        this.obstacles = obstacles;
         activeKeys = new HashSet<>();
 
         // Zamanlayıcı: Tuşlar basılıyken hareketi sürekli gerçekleştirir
@@ -26,13 +28,11 @@ public class PlayerMovement extends KeyAdapter {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        // Basılan tuşu aktif tuşlar setine ekle
         activeKeys.add(e.getKeyCode());
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        // Serbest bırakılan tuşu aktif tuşlar setinden çıkar
         activeKeys.remove(e.getKeyCode());
     }
 
@@ -40,36 +40,57 @@ public class PlayerMovement extends KeyAdapter {
         int currentX = player.getX();
         int currentY = player.getY();
 
-        // Aktif tuşları kontrol ederek hareketi uygula
+        int nextX = currentX;
+        int nextY = currentY;
+
+        // Yönlere göre yeni pozisyonları belirle
         if (activeKeys.contains(KeyEvent.VK_UP) || activeKeys.contains(KeyEvent.VK_W)) {
-            currentY -= speed; // Yukarı hareket
+            nextY -= speed; // Yukarı hareket
         }
         if (activeKeys.contains(KeyEvent.VK_DOWN) || activeKeys.contains(KeyEvent.VK_S)) {
-            currentY += speed; // Aşağı hareket
+            nextY += speed; // Aşağı hareket
         }
         if (activeKeys.contains(KeyEvent.VK_LEFT) || activeKeys.contains(KeyEvent.VK_A)) {
-            currentX -= speed; // Sola hareket
+            nextX -= speed; // Sola hareket
         }
         if (activeKeys.contains(KeyEvent.VK_RIGHT) || activeKeys.contains(KeyEvent.VK_D)) {
-            currentX += speed; // Sağa hareket
+            nextX += speed; // Sağa hareket
         }
 
-        // Pozisyonun sınırların dışına çıkmamasını sağla
-        if (currentX < 0) currentX = 0; // Sol sınır
-        if (currentY < 0) currentY = 0; // Üst sınır
-        if (currentX + player.getWidth() > worldWidth) currentX = worldWidth - player.getWidth(); // Sağ sınır
-        if (currentY + player.getHeight() > worldHeight) currentY = worldHeight - player.getHeight(); // Alt sınır
+        // Çarpışma kontrolü için yeni sınırları belirle
+        Rectangle nextBounds = new Rectangle(nextX, nextY, player.getWidth(), player.getHeight());
+        for (GameObjectWrapper obstacleWrapper : obstacles) {
+            if (nextBounds.intersects(obstacleWrapper.object.getBounds())) {
+                // Çarpışma varsa yönleri sıfırla
+                if (activeKeys.contains(KeyEvent.VK_UP) || activeKeys.contains(KeyEvent.VK_W)) {
+                    nextY = currentY;
+                }
+                if (activeKeys.contains(KeyEvent.VK_DOWN) || activeKeys.contains(KeyEvent.VK_S)) {
+                    nextY = currentY;
+                }
+                if (activeKeys.contains(KeyEvent.VK_LEFT) || activeKeys.contains(KeyEvent.VK_A)) {
+                    nextX = currentX;
+                }
+                if (activeKeys.contains(KeyEvent.VK_RIGHT) || activeKeys.contains(KeyEvent.VK_D)) {
+                    nextX = currentX;
+                }
+            }
+        }
 
-        // Oyuncunun pozisyonunu güncelle
-        player.setLocation(currentX, currentY);
+        // Pozisyonun dünya sınırlarının dışına çıkmasını engelle
+        if (nextX < 0) nextX = 0; // Sol sınır
+        if (nextY < 0) nextY = 0; // Üst sınır
+        if (nextX + player.getWidth() > worldWidth) nextX = worldWidth - player.getWidth(); // Sağ sınır
+        if (nextY + player.getHeight() > worldHeight) nextY = worldHeight - player.getHeight(); // Alt sınır
+
+        // Yeni pozisyonu ayarla
+        player.setLocation(nextX, nextY);
     }
 
-    // Karakterin hızını ayarlamak için metod
     public void setSpeed(int newSpeed) {
         this.speed = newSpeed;
     }
 
-    // Karakterin mevcut hızını almak için metod
     public int getSpeed() {
         return speed;
     }

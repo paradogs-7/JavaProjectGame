@@ -32,6 +32,7 @@ public class World {
                 g.fillRect(0, 0, worldWidth, worldHeight); // Tüm dünya boyutunu doldur
             }
         };
+
         levelPanel.setLayout(null);
         levelPanel.setPreferredSize(new Dimension(worldWidth, worldHeight));
         levelPanel.setBounds(0, 0, worldWidth, worldHeight);
@@ -41,11 +42,12 @@ public class World {
         camera = new Camera(screenSize.width, screenSize.height, worldWidth, worldHeight);
 
         addPlayer();
-        addObject(0, 50, 50, 764, new Color(21, 64, 77), "WALL");
-        addObject(0, 0, 10800, 50, new Color(21, 64, 77), "CEILING");
-        addObject(0, 814, 10800, 50, new Color(21, 64, 77), "FLOOR");
+        addObject(0, 50, 50, 764, new Color(21, 64, 77), "Obstacle");
+        addObject(0, 0, 10800, 50, new Color(21, 64, 77), "Obstacle");
+        addObject(0, 814, 10800, 50, new Color(21, 64, 77), "Obstacle");
+        addObject(400, 500, 99, 50, new Color(21, 64, 77), "Obstacle");
 
-        PlayerMovement playerMovement = new PlayerMovement(player, levelPanel, worldWidth, worldHeight);
+        PlayerMovement playerMovement = new PlayerMovement(player, levelPanel, worldWidth, worldHeight, objects);
         levelPanel.addKeyListener(playerMovement);
 
         levelPanel.setFocusable(true);
@@ -53,7 +55,6 @@ public class World {
 
         Timer timer = new Timer(16, e -> {
             updateCamera();
-            checkCollisions();
         });
         timer.start();
 
@@ -65,7 +66,7 @@ public class World {
         player = new JLabel();
         player.setOpaque(true);
         player.setBackground(new Color(176, 76, 106)); // Gül kurusu
-        player.setBounds(750, 500, 35, 35);
+        player.setBounds(750, 400, 35, 35);
         levelPanel.add(player);
     }
 
@@ -91,33 +92,6 @@ public class World {
         int y = Math.max(0, Math.min(camera.getY(), worldHeight - cameraHeight));
 
         levelPanel.setLocation(-x, -y);
-    }
-
-    private void checkCollisions() {
-        Rectangle playerBounds = player.getBounds();
-
-        for (GameObjectWrapper objWrapper : objects) {
-            if (playerBounds.intersects(objWrapper.object.getBounds())) {
-                onCollision(objWrapper.object); // Çarpışma olduğunda çağır
-            }
-        }
-    }
-
-    private void onCollision(GameObject object) {
-        switch (object.getName()) {
-            case "WALL":
-                System.out.println("Collision with WALL at: " + object.getX() + ", " + object.getY());
-                break;
-            case "CEILING":
-                System.out.println("Collision with CEILING at: " + object.getX() + ", " + object.getY());
-                break;
-            case "FLOOR":
-                System.out.println("Collision with FLOOR at: " + object.getX() + ", " + object.getY());
-                break;
-            default:
-                System.out.println("Collision with UNKNOWN object!");
-                break;
-        }
     }
 
     public static void main(String[] args) {
