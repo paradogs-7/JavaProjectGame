@@ -18,20 +18,25 @@ public class World {
     private PlayerMovement playerMovement;
     private JLabel pausedLabel;
     private SoundManager soundManager;
+    private String selectedResolution;
+    private boolean isFullscreen;
 
 
-    public World(SoundManager soundManager) {
+    public World(SoundManager soundManager,String selectedResolution, boolean isFullscreen) {
+        this.selectedResolution = selectedResolution;
+        this.isFullscreen = isFullscreen;
         this.soundManager = soundManager;
-        soundManager.loadSound("gameMusic", "resources/gamemusic.wav");
-        soundManager.playSound("gameMusic", true); // Oyun müziğini başlat
+        soundManager.loadSound("gameMusic", "resources/gamemusic.mp3");
+        soundManager.playSound("gameMusic", true);
 
+        // Pencere oluşturma ve ayarlara göre ayarlama
         frame = new JFrame("Diamond Rush - Level 1");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(false);
         frame.setUndecorated(true);
+        frame.setResizable(false);
+        applyResolution(selectedResolution);
+        applyFullscreen(isFullscreen);
 
-        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        gd.setFullScreenWindow(frame);
 
         objects = new ArrayList<>(); // Obje listesi
 
@@ -198,9 +203,33 @@ public class World {
             }
         }
     }
+    private void applyResolution(String resolution) {
+        String[] parts = resolution.split("x");
+        if (parts.length == 2) {
+            try {
+                int width = Integer.parseInt(parts[0]);
+                int height = Integer.parseInt(parts[1]);
+                frame.setSize(width, height);
+                if (camera != null) { // Kamera nesnesini kontrol et
+                    camera.setViewportSize(width, height);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Geçersiz çözünürlük formatı.");
+            }
+        }
+    }
+    private void applyFullscreen(boolean fullscreen) {
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        if (fullscreen) {
+            gd.setFullScreenWindow(frame); // Tam ekran moduna al
+        } else {
+            gd.setFullScreenWindow(null); // Pencere moduna geri dön
+            applyResolution(selectedResolution);
+        }
+    }
 
     public static void main(String[] args) {
         SoundManager soundManager = new SoundManager();
-        new World(soundManager);
+        new World(soundManager,"1920x1080",true);
     }
 }

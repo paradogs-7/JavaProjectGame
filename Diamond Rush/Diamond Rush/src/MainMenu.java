@@ -1,34 +1,36 @@
-import javax.swing.*;  // Swing kütüphanesi
-import java.awt.*;     // Layout ve grafik öğeleri
-import java.awt.event.*;  // Butonlar için olay dinleyiciler
-import java.io.IOException;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
 import javax.imageio.ImageIO;
 
 public class MainMenu {
     private JFrame frame;
     private JPanel panel;
     private SoundManager soundManager;
+    private static final String SETTINGS_FILE = "settings.txt";
+    private String selectedResolution = "1920x1080";
+    private boolean isFullscreen = true;
 
-    // Constructor: Ana pencere ve menü elemanlarını oluşturur
     public MainMenu() {
         soundManager = new SoundManager();
-        soundManager.loadSound("menuMusic", "resources/menumusic.wav");
+        soundManager.loadSound("menuMusic", "resources/menumusic.mp3");
         soundManager.playSound("menuMusic", true);
 
-        // Ana pencere oluşturma
+        // Ayarları yükle
+        loadSettings();
+
+        // Ana pencere oluşturma ve ayarları uygulama
         frame = new JFrame("Diamond Rush");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(false);
         frame.setUndecorated(true);
-
-        // Ekran çözünürlüğünü al ve pencereyi tam ekran yap
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setSize(screenSize.width, screenSize.height);
-        frame.setLocation(0, 0);
+        frame.setResizable(false);
+        applyResolution(selectedResolution);
+        applyFullscreen(isFullscreen);
 
         // Panel oluşturma ve arka plan görseli ekleme
         panel = new BackgroundPanel("resources/MainMenuBackground.jpg");
-        panel.setLayout(new GridBagLayout());  // Düzen yerleşimi
+        panel.setLayout(new GridBagLayout());
         frame.add(panel);
 
         // Butonları ekle
@@ -38,39 +40,34 @@ public class MainMenu {
         frame.setVisible(true);
     }
 
-    // Butonları oluştur ve panel üzerine ekle
     private void addButtons() {
-        // GridBagLayout için konumlandırma
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);  // Butonlar arası boşluk
+        gbc.insets = new Insets(10, 10, 10, 10);
 
-        // Play Butonu
         JButton playButton = createButton("Play", "resources/PlayButton.jpg");
         playButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                startGame();  // Play tuşu ile oyunu başlat
+                startGame();
             }
         });
         gbc.gridx = 0;
         gbc.gridy = 0;
         panel.add(playButton, gbc);
 
-        // Options Butonu
         JButton optionsButton = createButton("Options", "resources/OptionsButton.jpg");
         optionsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                openSettings();  // Options tuşu ile ayarları aç
+                openSettings();
             }
         });
         gbc.gridx = 0;
         gbc.gridy = 1;
         panel.add(optionsButton, gbc);
 
-        // Quit Butonu
         JButton quitButton = createButton("Quit", "resources/QuitButton.jpg");
         quitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);  // Quit tuşu ile çıkış yap
+                System.exit(0);
             }
         });
         gbc.gridx = 0;
@@ -78,52 +75,83 @@ public class MainMenu {
         panel.add(quitButton, gbc);
     }
 
-    // Özel buton oluşturma metodu (ikon desteği ile)
     private JButton createButton(String text, String iconPath) {
         JButton button = new JButton(text);
-
         try {
-            // İkon dosyasını yükle
             ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource(iconPath));
-            Image scaledIcon = icon.getImage().getScaledInstance(210, 82, Image.SCALE_SMOOTH); // İkonu boyutlandır
-            button.setIcon(new ImageIcon(scaledIcon)); // Butona ikonu ekle
-            button.setText(""); // Metni kaldır (sadece ikon görünsün isterseniz)
+            Image scaledIcon = icon.getImage().getScaledInstance(210, 82, Image.SCALE_SMOOTH);
+            button.setIcon(new ImageIcon(scaledIcon));
+            button.setText("");
         } catch (Exception e) {
             System.out.println("İkon yüklenemedi: " + iconPath);
         }
-
-        button.setPreferredSize(new Dimension(210, 82)); // Buton boyutu
-        button.setFocusPainted(false); // Odak çizgilerini kaldır
-        button.setBackground(new Color(70, 70, 70)); // Koyu arka plan
-        button.setForeground(new Color(220, 220, 220)); // Açık metin
-        button.setFont(new Font("Arial", Font.BOLD, 20)); // Metin fontu ve boyutu
-        button.setHorizontalTextPosition(SwingConstants.CENTER); // Metni ikonun üzerine yerleştir
-        button.setVerticalTextPosition(SwingConstants.CENTER); // Metni ikonun ortasına yerleştir
+        button.setPreferredSize(new Dimension(210, 82));
+        button.setFocusPainted(false);
+        button.setBackground(new Color(70, 70, 70));
+        button.setForeground(new Color(220, 220, 220));
+        button.setFont(new Font("Arial", Font.BOLD, 20));
+        button.setHorizontalTextPosition(SwingConstants.CENTER);
+        button.setVerticalTextPosition(SwingConstants.CENTER);
         return button;
     }
 
     private void startGame() {
-        frame.dispose(); // Ana menü penceresini kapat
+        frame.dispose();
         soundManager.stopSound("menuMusic");
-        new World(soundManager);   // World sınıfını başlat
+        new World(soundManager,selectedResolution,isFullscreen);
     }
 
     private void openSettings() {
-        new GameSettings(soundManager); // GameSettings'i başlat
+        new GameSettings(soundManager);
+    }
+    private void loadSettings() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(SETTINGS_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("resolution=")) {
+                    selectedResolution = line.substring(11);
+                } else if (line.startsWith("fullscreen=")) {
+                    isFullscreen = Boolean.parseBoolean(line.substring(11));
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            System.out.println("Ayarlar dosyası okunurken hata oluştu veya dosya bulunamadı. Varsayılan ayarlar kullanılacak.");
+        }
     }
 
-    // Programın giriş noktası
+    private void applyResolution(String resolution) {
+        String[] parts = resolution.split("x");
+        if (parts.length == 2) {
+            try {
+                int width = Integer.parseInt(parts[0]);
+                int height = Integer.parseInt(parts[1]);
+                frame.setSize(width, height);
+            } catch (NumberFormatException e) {
+                System.out.println("Geçersiz çözünürlük formatı.");
+            }
+        }
+    }
+
+
+    private void applyFullscreen(boolean fullscreen) {
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        if (fullscreen) {
+            gd.setFullScreenWindow(frame); // Tam ekran moduna al
+        } else {
+            gd.setFullScreenWindow(null); // Pencere moduna geri dön
+            applyResolution(selectedResolution);
+        }
+    }
+
     public static void main(String[] args) {
-        new MainMenu();  // Ana menüyü başlat
+        new MainMenu();
     }
 
-    // Arka plan görseli için özel bir JPanel sınıfı
     class BackgroundPanel extends JPanel {
         private Image backgroundImage;
 
         public BackgroundPanel(String filePath) {
             try {
-                // Kaynak dosyasından arka plan görselini yükle
                 backgroundImage = ImageIO.read(getClass().getClassLoader().getResourceAsStream(filePath));
             } catch (IOException e) {
                 e.printStackTrace();
