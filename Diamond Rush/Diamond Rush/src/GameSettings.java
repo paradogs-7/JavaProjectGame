@@ -11,9 +11,12 @@ public class GameSettings {
     private JSlider volumeSlider;
     private JComboBox<String> resolutionDropdown;
     private JCheckBox fullscreenCheckbox;
+    private SoundManager soundManager; // SoundManager instance
 
     // Constructor: Ayarlar ekranını başlatır
-    public GameSettings() {
+    public GameSettings(SoundManager soundManager) {
+        this.soundManager = soundManager;
+
         // Ayarlar penceresi oluşturma
         frame = new JFrame("Diamond Rush - Settings");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Sadece bu pencereyi kapat
@@ -55,7 +58,7 @@ public class GameSettings {
         gbc.gridy = 0;
         settingsPanel.add(volumeLabel, gbc);
 
-        volumeSlider = new JSlider(0, 100, 50); // Min: 0, Max: 100, Varsayılan: 50
+        volumeSlider = new JSlider(0, 100, (int)(soundManager.getVolume() * 100)); // Min: 0, Max: 100, Varsayılan: mevcut ses seviyesi
         volumeSlider.setMajorTickSpacing(25);
         volumeSlider.setPaintTicks(true);
         volumeSlider.setPaintLabels(true);
@@ -152,6 +155,9 @@ public class GameSettings {
         String resolution = (String) resolutionDropdown.getSelectedItem();
         boolean fullscreen = fullscreenCheckbox.isSelected();
 
+        // SoundManager ses seviyesini ayarla
+        soundManager.setVolume(volume / 100f);
+
         // Seçilen ayarları konsola yazdır (test amaçlı)
         System.out.println("Settings Saved:");
         System.out.println("Volume: " + volume);
@@ -164,6 +170,7 @@ public class GameSettings {
 
     // Main metodu (GameSettings çalıştırmak için)
     public static void main(String[] args) {
-        new GameSettings();
+        SoundManager soundManager = new SoundManager(); // SoundManager'ı başlat
+        new GameSettings(soundManager); // GameSettings'e SoundManager'ı gönder
     }
 }

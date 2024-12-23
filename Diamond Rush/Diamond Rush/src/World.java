@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;  // P tuşunu yakalamak için gerekli
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class World {
@@ -12,17 +12,19 @@ public class World {
     private int worldWidth = 10800;
     private int worldHeight = 1080;
     private ArrayList<GameObjectWrapper> objects;
-    private boolean keyAcquired = false; // Anahtarın alınıp alınmadığını tutar
-    private boolean isPaused = false;    // Oyun duraklatıldı mı?
-
-    // Kamera/KeyCollision kontrolü için zamanlayıcı
+    private boolean keyAcquired = false;
+    private boolean isPaused = false;
     private Timer updateTimer;
     private PlayerMovement playerMovement;
-
-    // ----- 1) PAUSED YAZISI İÇİN EKLEDİK -----
     private JLabel pausedLabel;
+    private SoundManager soundManager;
 
-    public World() {
+
+    public World(SoundManager soundManager) {
+        this.soundManager = soundManager;
+        soundManager.loadSound("gameMusic", "resources/gamemusic.wav");
+        soundManager.playSound("gameMusic", true); // Oyun müziğini başlat
+
         frame = new JFrame("Diamond Rush - Level 1");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
@@ -90,10 +92,12 @@ public class World {
                         // Oyunu durdur
                         playerMovement.pauseMovement();
                         pausedLabel.setVisible(true);   // "PAUSED" yazısını göster
+                        soundManager.stopSound("gameMusic");
                     } else {
                         // Oyunu devam ettir
                         playerMovement.resumeMovement();
                         pausedLabel.setVisible(false);  // "PAUSED" yazısını gizle
+                        soundManager.playSound("gameMusic",true);
                     }
                     levelPanel.repaint();
                 }
@@ -189,12 +193,14 @@ public class World {
                 levelPanel.revalidate();
                 levelPanel.repaint();
                 System.out.println("Key acquired!");
+                soundManager.stopSound("gameMusic");
                 break;
             }
         }
     }
 
     public static void main(String[] args) {
-        new World();
+        SoundManager soundManager = new SoundManager();
+        new World(soundManager);
     }
 }

@@ -7,9 +7,14 @@ import javax.imageio.ImageIO;
 public class MainMenu {
     private JFrame frame;
     private JPanel panel;
+    private SoundManager soundManager;
 
     // Constructor: Ana pencere ve menü elemanlarını oluşturur
     public MainMenu() {
+        soundManager = new SoundManager();
+        soundManager.loadSound("menuMusic", "resources/menumusic.wav");
+        soundManager.playSound("menuMusic", true);
+
         // Ana pencere oluşturma
         frame = new JFrame("Diamond Rush");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -99,11 +104,12 @@ public class MainMenu {
 
     private void startGame() {
         frame.dispose(); // Ana menü penceresini kapat
-        new World();   // World sınıfını başlat
+        soundManager.stopSound("menuMusic");
+        new World(soundManager);   // World sınıfını başlat
     }
 
     private void openSettings() {
-        new GameSettings(); // GameSettings'i başlat
+        new GameSettings(soundManager); // GameSettings'i başlat
     }
 
     // Programın giriş noktası
