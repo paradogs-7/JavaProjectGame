@@ -42,10 +42,27 @@ public class World {
 
         addPlayer();
         addKey(1000, 500); // Anahtarı ekle
-        addObject(0, 50, 50, 764, new Color(21, 64, 77), "Obstacle", false);
-        addObject(0, 0, 10800, 50, new Color(21, 64, 77), "Obstacle", false);
-        addObject(0, 814, 10800, 50, new Color(21, 64, 77), "Obstacle", false);
-        addObject(400, 500, 99, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(0, 50, 50, 980, new Color(21, 64, 77), "Obstacle", false);
+        addObject(0, 0, 2400, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(0, 1030, 2400, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(50, 630, 400, 400, new Color(180, 0, 0), "Obstacle", false);
+        addObject(50, 50, 400, 400, new Color(180, 0, 0), "Obstacle", false);
+        addObject(2000, 50, 400, 400, new Color(180, 0, 0), "Obstacle", false);
+        addObject(2000, 630, 400, 400, new Color(180, 0, 0), "Obstacle", false);
+        addObject(2900, 0, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(2900, 1030, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(2900, 730, 1300, 300, new Color(180, 0, 0), "Obstacle", false);
+        addObject(2900, 50, 1300, 300, new Color(180, 0, 0), "Obstacle", false);
+        addObject(5320, 0, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(5320, 1030, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(5320, 50, 50, 780, new Color(21, 64, 77), "Obstacle", false);
+        addObject(5370, 250, 450, 580, new Color(21, 64, 77), "Obstacle", false);
+        addObject(6220, 250, 450, 580, new Color(21, 64, 77), "Obstacle", false);
+        addObject(7190, 50, 50, 780, new Color(21, 64, 77), "Obstacle", false);
+        addObject(6990, 250, 200, 580, new Color(21, 64, 77), "Obstacle", false);
+        addObject(7740, 0, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(7740, 1030, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
+        addObject(8000, 250, 200, 580, new Color(21, 64, 77), "Obstacle", false);
 
         PlayerMovement playerMovement = new PlayerMovement(player, levelPanel, worldWidth, worldHeight, objects);
         levelPanel.addKeyListener(playerMovement);
@@ -80,7 +97,7 @@ public class World {
         player = new JLabel();
         player.setOpaque(true);
         player.setBackground(new Color(176, 76, 106)); // Gül kurusu
-        player.setBounds(750, 400, 35, 35);
+        player.setBounds(500, 450, 35, 35);
         levelPanel.add(player);
     }
 
