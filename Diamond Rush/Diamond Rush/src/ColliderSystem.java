@@ -6,7 +6,7 @@ public class ColliderSystem {
 
     public ColliderSystem() {
         colliders = new ArrayList<>();
-    }
+    } 
 
     // Çarpışma kontrolüne nesne ekle
     public void addCollider(GameObject object) {

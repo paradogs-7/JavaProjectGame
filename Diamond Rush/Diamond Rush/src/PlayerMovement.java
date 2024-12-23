@@ -12,6 +12,8 @@ public class PlayerMovement extends KeyAdapter {
     private int speed = 3;
     private Set<Integer> activeKeys;
     private List<GameObjectWrapper> obstacles;
+    private Timer movementTimer;
+    private boolean isMovementPaused = false;
 
     public PlayerMovement(JLabel player, JPanel panel, int worldWidth, int worldHeight, List<GameObjectWrapper> obstacles) {
         this.player = player;
@@ -21,7 +23,12 @@ public class PlayerMovement extends KeyAdapter {
         this.obstacles = obstacles;
         activeKeys = new HashSet<>();
 
-        Timer movementTimer = new Timer(10, e -> movePlayer());
+        movementTimer = new Timer(10, e -> {
+            // Eğer duraklatılmadıysa movePlayer() çalışsın
+            if (!isMovementPaused) {
+                movePlayer();
+            }
+        });
         movementTimer.start();
     }
 
@@ -83,6 +90,13 @@ public class PlayerMovement extends KeyAdapter {
 
         // Yeni pozisyonu ayarla
         player.setLocation(nextX, nextY);
+    }
+    public void pauseMovement() {
+        isMovementPaused = true;
+    }
+
+    public void resumeMovement() {
+        isMovementPaused = false;
     }
 
     public void setSpeed(int newSpeed) {

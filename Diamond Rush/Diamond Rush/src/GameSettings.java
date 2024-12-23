@@ -20,7 +20,7 @@ public class GameSettings {
         frame.setUndecorated(true); // Çerçeveyi kaldır
         frame.setResizable(false);
 
-        // Tam ekran modu
+        // Tam ekran modud
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         gd.setFullScreenWindow(frame);
 

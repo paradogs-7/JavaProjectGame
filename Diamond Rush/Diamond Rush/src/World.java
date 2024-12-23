@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;  // P tuşunu yakalamak için gerekli
 import java.util.ArrayList;
 
 public class World {
@@ -11,6 +13,14 @@ public class World {
     private int worldHeight = 1080;
     private ArrayList<GameObjectWrapper> objects;
     private boolean keyAcquired = false; // Anahtarın alınıp alınmadığını tutar
+    private boolean isPaused = false;    // Oyun duraklatıldı mı?
+
+    // Kamera/KeyCollision kontrolü için zamanlayıcı
+    private Timer updateTimer;
+    private PlayerMovement playerMovement;
+
+    // ----- 1) PAUSED YAZISI İÇİN EKLEDİK -----
+    private JLabel pausedLabel;
 
     public World() {
         frame = new JFrame("Diamond Rush - Level 1");
@@ -40,8 +50,9 @@ public class World {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         camera = new Camera(screenSize.width, screenSize.height, worldWidth, worldHeight);
 
+        // Oyuncu ve nesneleri ekleyelim
         addPlayer();
-        addKey(1000, 500); // Anahtarı ekle
+        addKey(1000, 500);
         addObject(0, 50, 50, 980, new Color(21, 64, 77), "Obstacle", false);
         addObject(0, 0, 2400, 50, new Color(21, 64, 77), "Obstacle", false);
         addObject(0, 1030, 2400, 50, new Color(21, 64, 77), "Obstacle", false);
@@ -64,39 +75,80 @@ public class World {
         addObject(7740, 1030, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
         addObject(8000, 250, 200, 580, new Color(21, 64, 77), "Obstacle", false);
 
-        PlayerMovement playerMovement = new PlayerMovement(player, levelPanel, worldWidth, worldHeight, objects);
+        // Oyuncu hareketi
+        playerMovement = new PlayerMovement(player, levelPanel, worldWidth, worldHeight, objects);
         levelPanel.addKeyListener(playerMovement);
+
+        // 2) P TUŞU İLE DURAKLATMA/DEVAM
+        levelPanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_P) {
+                    isPaused = !isPaused; // Durumu tersine çevir
+
+                    if (isPaused) {
+                        // Oyunu durdur
+                        playerMovement.pauseMovement();
+                        pausedLabel.setVisible(true);   // "PAUSED" yazısını göster
+                    } else {
+                        // Oyunu devam ettir
+                        playerMovement.resumeMovement();
+                        pausedLabel.setVisible(false);  // "PAUSED" yazısını gizle
+                    }
+                    levelPanel.repaint();
+                }
+            }
+        });
+
+        // 3) PAUSED YAZISINI HAZIRLA (ortaya alıyoruz)
+        pausedLabel = new JLabel("PAUSED");
+        pausedLabel.setForeground(Color.RED);
+        pausedLabel.setFont(new Font("Arial", Font.BOLD, 48));
+
+        // Label’in genişliği ve yüksekliği (tahmini)
+        int pausedLabelWidth = 300;
+        int pausedLabelHeight = 60;
+
+        // Ekran merkezini hesaplayarak Label’ı konumlandır
+        int pausedLabelX = (screenSize.width - pausedLabelWidth) / 2;
+        int pausedLabelY = (screenSize.height - pausedLabelHeight) / 2;
+
+        pausedLabel.setBounds(pausedLabelX, pausedLabelY, pausedLabelWidth, pausedLabelHeight);
+        pausedLabel.setVisible(false);  // Başlangıçta gizli
+        levelPanel.add(pausedLabel);
 
         levelPanel.setFocusable(true);
         levelPanel.requestFocusInWindow();
 
-        Timer timer = new Timer(16, e -> {
-            updateCamera();
-            checkKeyCollision(); // Anahtar çarpışmasını kontrol et
+        // Kamera ve anahtar kontrol Timer
+        updateTimer = new Timer(16, e -> {
+            // Oyunu duraklattığımızda da kamera vs. dursun isterseniz:
+            if (!isPaused) {
+                updateCamera();
+                checkKeyCollision(); // Anahtar çarpışmasını kontrol et
+            }
         });
-        timer.start();
+        updateTimer.start();
 
         frame.pack();
         frame.setVisible(true);
     }
 
-
     private void addKey(int x, int y) {
-        JLabel keyLabel = new JLabel(); // Label oluştur
-
+        JLabel keyLabel = new JLabel();
         keyLabel.setOpaque(true);
-        keyLabel.setBackground(Color.YELLOW); // Anahtarı sarı yap
-
+        keyLabel.setBackground(Color.YELLOW);
         keyLabel.setBounds(x, y, 35, 35);
-        GameObject keyObject = new GameObject("key", x, y, 35, 35, true); // Yeni anahtar objesi
-        objects.add(new GameObjectWrapper(keyLabel,keyObject));
+
+        GameObject keyObject = new GameObject("key", x, y, 35, 35, true);
+        objects.add(new GameObjectWrapper(keyLabel, keyObject));
         levelPanel.add(keyLabel);
     }
 
     private void addPlayer() {
         player = new JLabel();
         player.setOpaque(true);
-        player.setBackground(new Color(176, 76, 106)); // Gül kurusu
+        player.setBackground(new Color(176, 76, 106));
         player.setBounds(500, 450, 35, 35);
         levelPanel.add(player);
     }
@@ -125,19 +177,19 @@ public class World {
     }
 
     private void checkKeyCollision() {
-        if (keyAcquired) return; // Anahtar zaten alındıysa kontrol yapma
+        if (keyAcquired) return;
 
         Rectangle playerBounds = player.getBounds();
 
         for (GameObjectWrapper objectWrapper : objects) {
             if (objectWrapper.object.isKey() && playerBounds.intersects(objectWrapper.object.getBounds())) {
-                keyAcquired = true; // Anahtarı aldık
-                levelPanel.removeAll(); // Tüm bileşenleri temizle
-                levelPanel.add(player);  // Oyuncuyu ekle
+                keyAcquired = true;
+                levelPanel.removeAll();
+                levelPanel.add(player);
                 levelPanel.revalidate();
                 levelPanel.repaint();
                 System.out.println("Key acquired!");
-                break; // Çarpışmayı bulduktan sonra döngüyü bitir
+                break;
             }
         }
     }
