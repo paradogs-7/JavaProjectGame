@@ -14,7 +14,7 @@ public class MainMenu {
 
     public MainMenu() {
         soundManager = new SoundManager();
-        soundManager.loadSound("menuMusic", "resources/menumusic.mp3");
+        soundManager.loadSound("menuMusic", "resources/menumusic.wav");
         soundManager.playSound("menuMusic", true);
 
         // Ayarları yükle

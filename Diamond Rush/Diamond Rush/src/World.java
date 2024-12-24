@@ -26,7 +26,7 @@ public class World {
         this.selectedResolution = selectedResolution;
         this.isFullscreen = isFullscreen;
         this.soundManager = soundManager;
-        soundManager.loadSound("gameMusic", "resources/gamemusic.mp3");
+        soundManager.loadSound("gameMusic", "resources/gamemusic.wav");
         soundManager.playSound("gameMusic", true);
 
         // Pencere oluşturma ve ayarlara göre ayarlama
