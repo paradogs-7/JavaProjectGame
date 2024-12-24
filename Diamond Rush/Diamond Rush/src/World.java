@@ -20,9 +20,10 @@ public class World {
     private SoundManager soundManager;
     private String selectedResolution;
     private boolean isFullscreen;
+    private ArrayList<Enemy> enemies; // Enemy listesi eklendi
 
 
-    public World(SoundManager soundManager,String selectedResolution, boolean isFullscreen) {
+    public World(SoundManager soundManager, String selectedResolution, boolean isFullscreen) {
         this.selectedResolution = selectedResolution;
         this.isFullscreen = isFullscreen;
         this.soundManager = soundManager;
@@ -39,6 +40,7 @@ public class World {
 
 
         objects = new ArrayList<>(); // Obje listesi
+        enemies = new ArrayList<>(); // Enemy listesi
 
         levelPanel = new JPanel() {
             @Override
@@ -83,6 +85,8 @@ public class World {
         addObject(8124, 50, 384, 580, new Color(21, 64, 77), "Obstacle", false);
         addObject(8892, 50, 384, 580, new Color(21, 64, 77), "Obstacle", false);
         addObject(9610, 50, 50, 980, new Color(21, 64, 77), "Obstacle", false);
+        addEnemies();
+
         // Oyuncu hareketi
         playerMovement = new PlayerMovement(player, levelPanel, worldWidth, worldHeight, objects);
         levelPanel.addKeyListener(playerMovement);
@@ -103,7 +107,7 @@ public class World {
                         // Oyunu devam ettir
                         playerMovement.resumeMovement();
                         pausedLabel.setVisible(false);  // "PAUSED" yazısını gizle
-                        soundManager.playSound("gameMusic",true);
+                        soundManager.playSound("gameMusic", true);
                     }
                     levelPanel.repaint();
                 }
@@ -136,6 +140,8 @@ public class World {
             if (!isPaused) {
                 updateCamera();
                 checkKeyCollision(); // Anahtar çarpışmasını kontrol et
+                updateEnemies();
+                checkEnemyCollisions();
             }
         });
         updateTimer.start();
@@ -143,6 +149,34 @@ public class World {
         frame.pack();
         frame.setVisible(true);
     }
+
+    private void addEnemies(){
+        addEnemy(4000, 4500, 250, 350, 3, 2, 4000, 250, 35, 35, new Color(120, 100, 100), 8600, 450);
+        addEnemy(5000, 5500, 500, 700, 2, 1, 5000, 600, 35, 35, new Color(120, 100, 100), 8600, 450);
+        addEnemy(7000, 7500, 150, 300, 3, 1, 7000, 300, 35, 35, new Color(120, 100, 100), 8600, 450);
+        // level 1
+        addEnemy(650, 750, 50, 950, 2, 9, 700, 100, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(750, 850, 50, 950, 2, 9, 750, 900, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(850, 950, 50, 950, 2, 9, 850, 100, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(950, 1050, 50, 950, 2, 9, 950, 900, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(1050, 1150, 50, 950, 2, 9, 1050, 100, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(1150, 1250, 50, 950, 2, 9, 1150, 900, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(1250, 1350, 50, 950, 2, 9, 1250, 100, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(1350, 1450, 50, 950, 2, 9, 1350, 900, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(1450, 1550, 50, 950, 2, 9, 1450, 100, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(1550, 1650, 50, 950, 2, 9, 1550, 900, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(1650, 1750, 50, 950, 2, 9, 1650, 100, 35, 35, new Color(120, 100, 100), 400, 500);
+        addEnemy(1750, 1850, 50, 950, 2, 9, 1750, 900, 35, 35, new Color(120, 100, 100), 400, 500);
+
+    }
+
+
+    private void addEnemy(int startX, int endX, int startY, int endY, int speedX, int speedY,int x, int y, int width, int height, Color color, int playerStartX, int playerStartY) {
+        Enemy enemy = new Enemy(startX, endX, startY, endY, speedX, speedY, x, y, width, height, color, playerStartX, playerStartY);
+        enemies.add(enemy);
+        levelPanel.add(enemy.getLabel());
+    }
+
 
     private void addKey(int x, int y) {
         JLabel keyLabel = new JLabel();
@@ -159,7 +193,7 @@ public class World {
         player = new JLabel();
         player.setOpaque(true);
         player.setBackground(new Color(176, 76, 106));
-        player.setBounds(8600, 450, 35, 35);
+        player.setBounds(400, 500, 35, 35);
         levelPanel.add(player);
     }
 
@@ -204,6 +238,25 @@ public class World {
             }
         }
     }
+
+    private void updateEnemies() {
+        for (Enemy enemy : enemies) {
+            enemy.move();
+        }
+    }
+
+    private void checkEnemyCollisions() {
+        Rectangle playerBounds = player.getBounds();
+
+        for (Enemy enemy : enemies) {
+            if (enemy.checkCollision(playerBounds)) {
+                enemy.resetPlayerPosition(player);
+                System.out.println("Enemy collision detected!");
+            }
+        }
+    }
+
+
     private void applyResolution(String resolution) {
         String[] parts = resolution.split("x");
         if (parts.length == 2) {
@@ -219,6 +272,7 @@ public class World {
             }
         }
     }
+
     private void applyFullscreen(boolean fullscreen) {
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         if (fullscreen) {
@@ -231,6 +285,6 @@ public class World {
 
     public static void main(String[] args) {
         SoundManager soundManager = new SoundManager();
-        new World(soundManager,"1920x1080",true);
+        new World(soundManager, "1920x1080", true);
     }
 }
