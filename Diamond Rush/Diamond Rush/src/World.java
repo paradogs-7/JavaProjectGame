@@ -80,8 +80,9 @@ public class World {
         addObject(6990, 250, 200, 580, new Color(21, 64, 77), "Obstacle", false);
         addObject(7740, 0, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
         addObject(7740, 1030, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
-        addObject(8000, 250, 200, 580, new Color(21, 64, 77), "Obstacle", false);
-
+        addObject(8124, 50, 384, 580, new Color(21, 64, 77), "Obstacle", false);
+        addObject(8892, 50, 384, 580, new Color(21, 64, 77), "Obstacle", false);
+        addObject(9610, 50, 50, 980, new Color(21, 64, 77), "Obstacle", false);
         // Oyuncu hareketi
         playerMovement = new PlayerMovement(player, levelPanel, worldWidth, worldHeight, objects);
         levelPanel.addKeyListener(playerMovement);
@@ -158,7 +159,7 @@ public class World {
         player = new JLabel();
         player.setOpaque(true);
         player.setBackground(new Color(176, 76, 106));
-        player.setBounds(500, 450, 35, 35);
+        player.setBounds(8600, 450, 35, 35);
         levelPanel.add(player);
     }
 
