@@ -85,6 +85,7 @@ public class World {
         addObject(8124, 50, 384, 580, new Color(21, 64, 77), "Obstacle", false);
         addObject(8892, 50, 384, 580, new Color(21, 64, 77), "Obstacle", false);
         addObject(9610, 50, 50, 980, new Color(21, 64, 77), "Obstacle", false);
+        addObject(7740, 50, 50, 780, new Color(21, 64, 77), "Obstacle", false);
         addEnemies();
 
         // Oyuncu hareketi
