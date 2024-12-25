@@ -46,7 +46,7 @@ public class World {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.setColor(new Color(213, 231, 181));
+                g.setColor(new Color(255, 153, 0));
                 g.fillRect(0, 0, worldWidth, worldHeight); // Tüm dünya boyutunu doldur
             }
         };
@@ -65,10 +65,10 @@ public class World {
         addObject(0, 50, 50, 980, new Color(21, 64, 77), "Obstacle", false);
         addObject(0, 0, 2400, 50, new Color(21, 64, 77), "Obstacle", false);
         addObject(0, 1030, 2400, 50, new Color(21, 64, 77), "Obstacle", false);
-        addObject(50, 630, 400, 400, new Color(180, 0, 0), "Obstacle", false);
-        addObject(50, 50, 400, 400, new Color(180, 0, 0), "Obstacle", false);
-        addObject(2000, 50, 400, 400, new Color(180, 0, 0), "Obstacle", false);
-        addObject(2000, 630, 400, 400, new Color(180, 0, 0), "Obstacle", false);
+        addObject(50, 630, 400, 400, new Color(50, 205, 50), "Obstacle", false);
+        addObject(50, 50, 400, 400, new Color(50, 205, 50), "Obstacle", false);
+        addObject(2000, 50, 400, 400, new Color(50, 205, 50), "Obstacle", false);
+        addObject(2000, 630, 400, 400, new Color(50, 205, 50), "Obstacle", false);
         addObject(2900, 0, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
         addObject(2900, 1030, 1920, 50, new Color(21, 64, 77), "Obstacle", false);
         addObject(2900, 730, 1300, 300, new Color(180, 0, 0), "Obstacle", false);
@@ -224,7 +224,7 @@ public class World {
         player = new JLabel();
         player.setOpaque(true);
         player.setBackground(new Color(176, 76, 106));
-        player.setBounds(7300, 500, 35, 35);
+        player.setBounds(600, 500, 35, 35);
         levelPanel.add(player);
     }
 
