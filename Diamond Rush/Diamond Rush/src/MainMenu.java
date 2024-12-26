@@ -98,12 +98,13 @@ public class MainMenu {
     private void startGame() {
         frame.dispose();
         soundManager.stopSound("menuMusic");
-        new World(soundManager,selectedResolution,isFullscreen);
+        new World(soundManager, selectedResolution, isFullscreen);
     }
 
     private void openSettings() {
         new GameSettings(soundManager);
     }
+
     private void loadSettings() {
         try (BufferedReader reader = new BufferedReader(new FileReader(SETTINGS_FILE))) {
             String line;
@@ -170,4 +171,5 @@ public class MainMenu {
             }
         }
     }
+
 }

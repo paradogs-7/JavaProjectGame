@@ -10,7 +10,6 @@ public class zGameController {
     private String selectedResolution = "1920x1080";
     private boolean isFullscreen = true;
 
-
     public zGameController(SoundManager soundManager) {
         this.soundManager = soundManager;
         loadSettings();
@@ -21,7 +20,7 @@ public class zGameController {
         score = 0;
         isPaused = false;
         System.out.println("Game started!");
-        new World(soundManager,selectedResolution,isFullscreen);
+        new World(soundManager, selectedResolution, isFullscreen);
     }
 
     public void pauseGame() {
@@ -55,4 +54,5 @@ public class zGameController {
         zGameController gameController = new zGameController(soundManager);
         gameController.startGame();
     }
+
 }

@@ -65,7 +65,7 @@ public class PlayerMovement extends KeyAdapter {
 
         Rectangle nextBounds = new Rectangle(nextX, nextY, player.getWidth(), player.getHeight());
         for (GameObjectWrapper obstacleWrapper : obstacles) {
-            if ( !obstacleWrapper.object.isKey() && nextBounds.intersects(obstacleWrapper.object.getBounds())) {
+            if (obstacleWrapper.object.getType() != null && !obstacleWrapper.object.getType().equals("key") && !obstacleWrapper.object.getType().equals("door") && nextBounds.intersects(obstacleWrapper.object.getBounds())) {
                 // Çarpışma varsa yönleri sıfırla
                 if (activeKeys.contains(KeyEvent.VK_UP) || activeKeys.contains(KeyEvent.VK_W)) {
                     nextY = currentY;
@@ -82,6 +82,7 @@ public class PlayerMovement extends KeyAdapter {
             }
         }
 
+
         // Pozisyonun dünya sınırlarının dışına çıkmasını engelle
         if (nextX < 0) nextX = 0;
         if (nextY < 0) nextY = 0;
@@ -91,6 +92,7 @@ public class PlayerMovement extends KeyAdapter {
         // Yeni pozisyonu ayarla
         player.setLocation(nextX, nextY);
     }
+
     public void pauseMovement() {
         isMovementPaused = true;
     }
@@ -106,4 +108,5 @@ public class PlayerMovement extends KeyAdapter {
     public int getSpeed() {
         return speed;
     }
+
 }

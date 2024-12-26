@@ -14,4 +14,5 @@ public class zPlayer {
     public JLabel getLabel() {
         return playerLabel;
     }
+
 }

@@ -6,7 +6,7 @@ public class ColliderSystem {
 
     public ColliderSystem() {
         colliders = new ArrayList<>();
-    } 
+    }
 
     // Çarpışma kontrolüne nesne ekle
     public void addCollider(GameObject object) {
@@ -38,4 +38,5 @@ public class ColliderSystem {
         System.out.println("Collision detected between " + obj1.getName() + " and " + obj2.getName());
         // Çarpışma tepkisini burada tanımlayın
     }
+
 }

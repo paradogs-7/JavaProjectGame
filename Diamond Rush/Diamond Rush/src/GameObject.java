@@ -3,15 +3,27 @@ import java.awt.*;
 public class GameObject {
     private String name;
     private Rectangle bounds;
-    private boolean isKey; // Yeni özellik: Anahtar mı?
+    private boolean isKey;
+    private String type; // Nesne tipi: "key", "door", "obstacle" vb.
+
+    public GameObject(String name, int x, int y, int width, int height, boolean isKey, String type) {
+        this.name = name;
+        this.bounds = new Rectangle(x, y, width, height);
+        this.isKey = isKey;
+        this.type = type;
+    }
 
     public GameObject(String name, int x, int y, int width, int height, boolean isKey) {
         this.name = name;
         this.bounds = new Rectangle(x, y, width, height);
         this.isKey = isKey;
+        this.type = null;
     }
 
-    // Mevcut metotlar
+    public String getType() {
+        return type;
+    }
+
     public Rectangle getBounds() {
         return bounds;
     }
@@ -44,7 +56,12 @@ public class GameObject {
         return isKey;
     }
 
-    public void setKey(boolean key){
+    public void setKey(boolean key) {
         this.isKey = key;
     }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
 }

@@ -46,4 +46,5 @@ public class Camera {
     public int getViewportHeight() {
         return viewportHeight;
     }
+
 }

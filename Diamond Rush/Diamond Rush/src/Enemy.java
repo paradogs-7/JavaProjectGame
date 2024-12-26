@@ -35,6 +35,7 @@ public class Enemy {
     public JLabel getLabel() {
         return label;
     }
+
     public GameObject getObject() {
         return object;
     }
@@ -55,15 +56,15 @@ public class Enemy {
 
         // Y ekseninde hareket
         currentY += speedY * directionY;
-        if(currentY >= endY){
+        if (currentY >= endY) {
             currentY = endY;
             directionY = -1;
-        } else if (currentY <= startY){
+        } else if (currentY <= startY) {
             currentY = startY;
             directionY = 1;
         }
 
-        object.setPosition(currentX,currentY);
+        object.setPosition(currentX, currentY);
         label.setLocation(currentX, currentY);
     }
 
@@ -74,4 +75,5 @@ public class Enemy {
     public void resetPlayerPosition(JLabel player) {
         player.setLocation(playerStartX, playerStartY);
     }
+
 }
