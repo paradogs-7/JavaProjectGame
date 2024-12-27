@@ -20,7 +20,7 @@ public class zGameController {
         score = 0;
         isPaused = false;
         System.out.println("Game started!");
-        new World(soundManager, selectedResolution, isFullscreen);
+        new GameFrame(selectedResolution, isFullscreen, soundManager);
     }
 
     public void pauseGame() {

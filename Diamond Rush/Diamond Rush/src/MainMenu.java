@@ -98,7 +98,7 @@ public class MainMenu {
     private void startGame() {
         frame.dispose();
         soundManager.stopSound("menuMusic");
-        new World(soundManager, selectedResolution, isFullscreen);
+        new GameFrame(selectedResolution, isFullscreen, soundManager);
     }
 
     private void openSettings() {
