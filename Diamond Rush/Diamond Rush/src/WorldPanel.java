@@ -385,7 +385,7 @@ public class WorldPanel extends JPanel {
      */
     private void showGameOver() {
         // Son level kapıya değince
-        JOptionPane.showMessageDialog(this, "Game Over Congerlation!");
+        JOptionPane.showMessageDialog(this, "Congratulations, Game Over!");
 
         // Ayar dosyasına level=1 yazarak oyunu ilk seviyeye sıfırlar
         saveLevelToFile(1);
