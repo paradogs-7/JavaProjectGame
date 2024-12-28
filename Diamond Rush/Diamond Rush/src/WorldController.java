@@ -4,11 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.Color;
 
 public class WorldController {
-
-    private WorldPanel worldPanel;      // Oyun sahnesini çizen panel
+    private WorldPanel worldPanel;
     private Timer updateTimer;
     private boolean isPaused = false;
 
@@ -16,19 +14,21 @@ public class WorldController {
     private String selectedResolution;
     private boolean isFullscreen;
 
-    public WorldController(String selectedResolution, boolean isFullscreen, SoundManager soundManager) {
+    // Yeni eklenen değişken
+    private int lastLevel;
+
+    public WorldController(String selectedResolution, boolean isFullscreen, SoundManager soundManager, int lastLevel) {
         this.selectedResolution = selectedResolution;
         this.isFullscreen = isFullscreen;
         this.soundManager = soundManager;
+        this.lastLevel = lastLevel;
 
-        // Oyun müziğini yükle ve çal
         soundManager.loadSound("gameMusic", "resources/gamemusic.wav");
         soundManager.playSound("gameMusic", true);
 
-        // WorldPanel (oyun sahnesi) oluştur
-        worldPanel = new WorldPanel(soundManager);
+        // WorldPanel’i lastLevel ile başlatıyoruz
+        worldPanel = new WorldPanel(soundManager, lastLevel);
 
-        // --- Swing Timer ile 16 ms arayla updateWorld() çağrısı ---
         updateTimer = new Timer(16, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -39,7 +39,6 @@ public class WorldController {
         });
         updateTimer.start();
 
-        // --- 'P' tuşu ile duraklatma/başlatma için KeyListener ---
         worldPanel.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -49,30 +48,21 @@ public class WorldController {
             }
         });
 
-        // Odaklanabilmesi için
         worldPanel.setFocusable(true);
         worldPanel.requestFocusInWindow();
     }
 
-    /**
-     * Oyunu duraklatıp başlatmayı togglar.
-     */
     private void togglePause() {
         isPaused = !isPaused;
         if (isPaused) {
-            // Müzik durduruluyor
             soundManager.stopSound("gameMusic");
             worldPanel.showPausedLabel(true);
         } else {
-            // Müzik yeniden çalıyor
             soundManager.playSound("gameMusic", true);
             worldPanel.showPausedLabel(false);
         }
     }
 
-    /**
-     * Dışarıdan panel erişimi: Ana pencere (GameFrame) bu paneli ekler.
-     */
     public JPanel getPanel() {
         return worldPanel;
     }

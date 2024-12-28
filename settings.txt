@@ -1,3 +1,6 @@
-volume=100
-resolution=1920x1080
+#Updated game settings
+#Sat Dec 28 14:23:15 GMT+03:00 2024
 fullscreen=true
+level=1
+resolution=1920x1080
+volume=100

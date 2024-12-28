@@ -3,21 +3,24 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.imageio.ImageIO;
+import java.util.Properties;
 
 public class MainMenu {
     private JFrame frame;
     private JPanel panel;
     private SoundManager soundManager;
     private static final String SETTINGS_FILE = "settings.txt";
+
     private String selectedResolution = "1920x1080";
     private boolean isFullscreen = true;
+    private int lastLevel = 1;  // <--- En son kayıtlı level
 
     public MainMenu() {
         soundManager = new SoundManager();
         soundManager.loadSound("menuMusic", "resources/menumusic.wav");
         soundManager.playSound("menuMusic", true);
 
-        // Ayarları yükle
+        // Ayarları yükle (artık level bilgisi de yüklenecek)
         loadSettings();
 
         // Ana pencere oluşturma ve ayarları uygulama
@@ -96,27 +99,27 @@ public class MainMenu {
     }
 
     private void startGame() {
-        frame.dispose();
+        frame.dispose(); // MainMenu'yu kapat
         soundManager.stopSound("menuMusic");
-        new GameFrame(selectedResolution, isFullscreen, soundManager);
+
+        // lastLevel'ı parametre olarak GameFrame'e geçiyoruz
+        new GameFrame(selectedResolution, isFullscreen, soundManager, lastLevel);
     }
 
     private void openSettings() {
         new GameSettings(soundManager);
     }
 
+    // <--- Ayarları yüklerken level bilgisi de ekleniyor
     private void loadSettings() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(SETTINGS_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("resolution=")) {
-                    selectedResolution = line.substring(11);
-                } else if (line.startsWith("fullscreen=")) {
-                    isFullscreen = Boolean.parseBoolean(line.substring(11));
-                }
-            }
+        Properties props = new Properties();
+        try (FileReader reader = new FileReader(SETTINGS_FILE)) {
+            props.load(reader);
+            selectedResolution = props.getProperty("resolution", "1920x1080");
+            isFullscreen = Boolean.parseBoolean(props.getProperty("fullscreen", "true"));
+            lastLevel = Integer.parseInt(props.getProperty("level", "1"));
         } catch (IOException | NumberFormatException e) {
-            System.out.println("Ayarlar dosyası okunurken hata oluştu veya dosya bulunamadı. Varsayılan ayarlar kullanılacak.");
+            System.out.println("Ayarlar dosyası okunurken hata oluştu veya dosya yok. Varsayılan ayarlar kullanılacak.");
         }
     }
 
@@ -132,7 +135,6 @@ public class MainMenu {
             }
         }
     }
-
 
     private void applyFullscreen(boolean fullscreen) {
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -171,5 +173,4 @@ public class MainMenu {
             }
         }
     }
-
 }

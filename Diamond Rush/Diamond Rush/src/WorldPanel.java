@@ -1,19 +1,19 @@
-// WorldPanel.java
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class WorldPanel extends JPanel {
     private int worldWidth = 10800;
     private int worldHeight = 1080;
-
+    private int currentLevel = 1; // Sadece bir kez tanımlandı
     private JLabel player;
     private Camera camera;
     private ArrayList<GameObjectWrapper> objects;
     private ArrayList<Enemy> enemies;
-    private int currentLevel = 1;
     private JLabel pausedLabel;
     private boolean doorOpen = false;
     private int keysAcquired = 0;
@@ -25,8 +25,9 @@ public class WorldPanel extends JPanel {
     // Kapı ve anahtar referansları
     private GameObjectWrapper door;
     private GameObjectWrapper key;
+    private static final String SETTINGS_FILE = "settings.txt";
 
-    public WorldPanel(SoundManager soundManager) {
+    public WorldPanel(SoundManager soundManager, int lastLevel) {
         this.soundManager = soundManager;
 
         setLayout(null);
@@ -37,16 +38,18 @@ public class WorldPanel extends JPanel {
         enemies = new ArrayList<>();
         levelStartPoints = new HashMap<>();
 
-        // Başlangıç noktaları (level -> nokta)
         levelStartPoints.put(1, new Point(600, 500));
         levelStartPoints.put(2, new Point(3000, 500));
         levelStartPoints.put(3, new Point(6000, 500));
         levelStartPoints.put(4, new Point(8000, 500));
 
-        // Oyuncu bileşenini oluşturup ekle
+        // currentLevel'ı kaydedilen lastLevel'a eşitliyoruz
+        this.currentLevel = lastLevel;
+
+        // Oyuncuyu ekle
         addPlayer();
 
-        // Ekran boyutuna göre kamera
+        // Kamera ayarla
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         camera = new Camera(screenSize.width, screenSize.height, worldWidth, worldHeight);
 
@@ -54,18 +57,19 @@ public class WorldPanel extends JPanel {
         pausedLabel = new JLabel("PAUSED");
         pausedLabel.setForeground(Color.RED);
         pausedLabel.setFont(new Font("Arial", Font.BOLD, 48));
-        int pausedLabelWidth = 300;
-        int pausedLabelHeight = 60;
-        int pausedLabelX = (screenSize.width - pausedLabelWidth) / 2;
-        int pausedLabelY = (screenSize.height - pausedLabelHeight) / 2;
-        pausedLabel.setBounds(pausedLabelX, pausedLabelY, pausedLabelWidth, pausedLabelHeight);
         pausedLabel.setVisible(false);
         add(pausedLabel);
 
-        // İlk seviyeyi yükle
+        // Geçerli level’ı yükle
         addLevel(currentLevel);
 
-        // PlayerMovement ayarla
+        // Oyuncunun konumunu levelStartPoints’e göre ayarla
+        Point startPoint = levelStartPoints.get(currentLevel);
+        if (startPoint != null) {
+            player.setLocation(startPoint.x, startPoint.y);
+        }
+
+        // PlayerMovement
         playerMovement = new PlayerMovement(player, this, worldWidth, worldHeight, objects);
         addKeyListener(playerMovement);
     }
@@ -324,16 +328,17 @@ public class WorldPanel extends JPanel {
         Rectangle playerBounds = player.getBounds();
 
         // "key" tipli bir obje ile çarpışıyor mu?
-        for (GameObjectWrapper objectWrapper : objects) {
-            if (objectWrapper.object.getType() != null
-                    && objectWrapper.object.getType().equals("key")
-                    && playerBounds.intersects(objectWrapper.object.getBounds())) {
+        Iterator<GameObjectWrapper> iterator = objects.iterator();
+        while (iterator.hasNext()) {
+            GameObjectWrapper objectWrapper = iterator.next();
+            if ("key".equals(objectWrapper.object.getType()) &&
+                    playerBounds.intersects(objectWrapper.object.getBounds())) {
 
                 keysAcquired++;
                 System.out.println("Key acquired!");
                 // Panelden ve objects listesinden sil
                 remove(objectWrapper.label);
-                objects.remove(objectWrapper);
+                iterator.remove();
 
                 if (keysAcquired > 0) {
                     doorOpen = true; // Kapı artık açılabilir
@@ -351,21 +356,44 @@ public class WorldPanel extends JPanel {
 
         Rectangle playerBounds = player.getBounds();
         for (GameObjectWrapper objectWrapper : objects) {
-            if (objectWrapper.object.getType() != null
-                    && objectWrapper.object.getType().equals("door")
-                    && playerBounds.intersects(objectWrapper.object.getBounds())) {
+            if ("door".equals(objectWrapper.object.getType()) &&
+                    playerBounds.intersects(objectWrapper.object.getBounds())) {
 
-                currentLevel++;
-                doorOpen = false;
-                keysAcquired = 0;
-                addLevel(currentLevel);
-                System.out.println("Level geçildi, yeni level:" + currentLevel);
+                if (currentLevel < 4) {
+                    currentLevel++;
+                    doorOpen = false;
+                    keysAcquired = 0;
+                    addLevel(currentLevel);
+                    System.out.println("Level geçildi, yeni level: " + currentLevel);
 
-                // Müzik tekrar çalınabilir
-                soundManager.playSound("gameMusic", true);
+                    // Level bilgisini settings.txt'ye kaydet
+                    saveLevelToFile(currentLevel);
+
+                    // Müzik tekrar çalınabilir
+                    soundManager.playSound("gameMusic", true);
+                } else {
+                    // 4. seviyedeyiz ve kapıya ulaştık, oyunu bitir
+                    showGameOver();
+                }
                 break;
             }
         }
+    }
+
+    /**
+     * Son level kapıya ulaştığında oyunu bitirir ve ana menüye döner.
+     */
+    private void showGameOver() {
+        // Son level kapıya değince
+        JOptionPane.showMessageDialog(this, "Game Over Congerlation!");
+
+        // Ayar dosyasına level=1 yazarak oyunu ilk seviyeye sıfırlar
+        saveLevelToFile(1);
+
+        // Ana menüye dön
+        SwingUtilities.getWindowAncestor(this).dispose(); // Mevcut GameFrame'i kapat
+        soundManager.stopSound("gameMusic");
+        new MainMenu();  // Yeni Ana Menü aç
     }
 
     /**
@@ -477,5 +505,30 @@ public class WorldPanel extends JPanel {
      */
     public void showPausedLabel(boolean show) {
         pausedLabel.setVisible(show);
+    }
+
+    /**
+     * Level bilgisini settings.txt'ye kaydeden yardımcı metot
+     */
+    private void saveLevelToFile(int level) {
+        try {
+            // Önce mevcut ayarları okuyalım, satır satır “level=” olanı değiştireceğiz
+            java.util.Properties props = new java.util.Properties();
+            try (FileReader fr = new FileReader(SETTINGS_FILE)) {
+                props.load(fr);
+            } catch (IOException e) {
+                // Dosya yoksa sorun değil, yeniden oluşturacağız
+            }
+
+            // level güncelle
+            props.setProperty("level", String.valueOf(level));
+
+            // Tekrar yaz
+            try (FileWriter fw = new FileWriter(SETTINGS_FILE)) {
+                props.store(fw, "Updated game settings");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

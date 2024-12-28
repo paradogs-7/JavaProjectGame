@@ -9,18 +9,18 @@ public class zGameController {
     private static final String SETTINGS_FILE = "settings.txt";
     private String selectedResolution = "1920x1080";
     private boolean isFullscreen = true;
+    private int lastLevel = 1; // Varsayılan olarak ilk seviyeye ayarlandı
 
     public zGameController(SoundManager soundManager) {
         this.soundManager = soundManager;
         loadSettings();
     }
 
-
     public void startGame() {
         score = 0;
         isPaused = false;
         System.out.println("Game started!");
-        new GameFrame(selectedResolution, isFullscreen, soundManager);
+        new GameFrame(selectedResolution, isFullscreen, soundManager, lastLevel);
     }
 
     public void pauseGame() {
@@ -41,6 +41,8 @@ public class zGameController {
                     selectedResolution = line.substring(11);
                 } else if (line.startsWith("fullscreen=")) {
                     isFullscreen = Boolean.parseBoolean(line.substring(11));
+                } else if (line.startsWith("level=")) { // Level bilgisini de yükleyin
+                    lastLevel = Integer.parseInt(line.substring(6));
                 }
             }
         } catch (IOException | NumberFormatException e) {
@@ -48,11 +50,9 @@ public class zGameController {
         }
     }
 
-
     public static void main(String[] args) {
         SoundManager soundManager = new SoundManager();
         zGameController gameController = new zGameController(soundManager);
         gameController.startGame();
     }
-
 }

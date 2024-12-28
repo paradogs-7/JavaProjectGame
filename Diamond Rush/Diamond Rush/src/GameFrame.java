@@ -7,32 +7,32 @@ public class GameFrame extends JFrame {
     private boolean isFullscreen;
     private SoundManager soundManager;
 
-    public GameFrame(String selectedResolution, boolean isFullscreen, SoundManager soundManager) {
+    // Yeni eklenen değişken
+    private int lastLevel;
+
+    // Yapıcı metot artık lastLevel'ı da alıyor
+    public GameFrame(String selectedResolution, boolean isFullscreen, SoundManager soundManager, int lastLevel) {
         // Parametrelerden gelen değerleri saklayın
         this.selectedResolution = selectedResolution;
         this.isFullscreen = isFullscreen;
         this.soundManager = soundManager;
+        this.lastLevel = lastLevel;
 
-        // JFrame ayarları
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setUndecorated(true);
         setResizable(false);
 
-        // Çözünürlük ve tam ekran ayarlarını uygula
         applyResolution(selectedResolution);
         applyFullscreen(isFullscreen);
 
-        // WorldController oluşturup ekleyin
-        worldController = new WorldController(selectedResolution, isFullscreen, soundManager);
-        add(worldController.getPanel()); // WorldPanel, WorldController içinden alınıyor
+        // WorldController oluşturup ekleyin (lastLevel'ı da veriyoruz)
+        worldController = new WorldController(selectedResolution, isFullscreen, soundManager, lastLevel);
+        add(worldController.getPanel());
 
         pack();
         setVisible(true);
     }
 
-    /**
-     * Metin olarak gelen "1920x1080" gibi bir çözünürlüğü parse edip pencere boyutunu ayarlar.
-     */
     private void applyResolution(String resolution) {
         String[] parts = resolution.split("x");
         if (parts.length == 2) {
