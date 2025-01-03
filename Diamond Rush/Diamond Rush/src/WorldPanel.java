@@ -19,16 +19,21 @@ public class WorldPanel extends JPanel {
     private int keysAcquired = 0;
     private SoundManager soundManager;
     private PlayerMovement playerMovement;
-    private Map<Integer, Point> levelStartPoints;
     private boolean resetFlag = false;
 
     // Kapı ve anahtar referansları
     private GameObjectWrapper door;
     private GameObjectWrapper key;
+
     private static final String SETTINGS_FILE = "settings.txt";
 
-    public WorldPanel(SoundManager soundManager, int lastLevel) {
+    // Yeni eklenen SpawnPointManager referansı
+    private SpawnPointManager spawnPointManager;
+
+    public WorldPanel(SoundManager soundManager, int lastLevel, SpawnPointManager spawnPointManager) {
         this.soundManager = soundManager;
+        this.spawnPointManager = spawnPointManager;  // constructor'dan aldığımız manager'ı saklıyoruz
+        this.currentLevel = lastLevel;               // Mevcut level'i alıyoruz
 
         setLayout(null);
         setPreferredSize(new Dimension(worldWidth, worldHeight));
@@ -36,20 +41,11 @@ public class WorldPanel extends JPanel {
 
         objects = new ArrayList<>();
         enemies = new ArrayList<>();
-        levelStartPoints = new HashMap<>();
-
-        levelStartPoints.put(1, new Point(600, 500));
-        levelStartPoints.put(2, new Point(3000, 500));
-        levelStartPoints.put(3, new Point(6000, 500));
-        levelStartPoints.put(4, new Point(8000, 500));
-
-        // currentLevel'ı kaydedilen lastLevel'a eşitliyoruz
-        this.currentLevel = lastLevel;
 
         // Oyuncuyu ekle
         addPlayer();
 
-        // Kamera ayarla
+        // Kamera ayarla (ekran boyutu için)
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         camera = new Camera(screenSize.width, screenSize.height, worldWidth, worldHeight);
 
@@ -60,11 +56,11 @@ public class WorldPanel extends JPanel {
         pausedLabel.setVisible(false);
         add(pausedLabel);
 
-        // Geçerli level’ı yükle
+        // Level'ı yükle
         addLevel(currentLevel);
 
-        // Oyuncunun konumunu levelStartPoints’e göre ayarla
-        Point startPoint = levelStartPoints.get(currentLevel);
+        // Oyuncunun konumunu SpawnPointManager'a göre ayarla
+        Point startPoint = spawnPointManager.getSpawnPointForLevel(currentLevel);
         if (startPoint != null) {
             player.setLocation(startPoint.x, startPoint.y);
         }
@@ -240,7 +236,6 @@ public class WorldPanel extends JPanel {
                 addEnemiesLevel4();
                 break;
             default:
-                // Geçersiz seviye
                 System.out.println("Geçersiz level değeri.");
         }
     }
@@ -364,6 +359,7 @@ public class WorldPanel extends JPanel {
                     doorOpen = false;
                     keysAcquired = 0;
                     addLevel(currentLevel);
+
                     System.out.println("Level geçildi, yeni level: " + currentLevel);
 
                     // Level bilgisini settings.txt'ye kaydet
@@ -432,7 +428,9 @@ public class WorldPanel extends JPanel {
         doorOpen = false;
 
         addLevel(currentLevel);
-        Point startPoint = levelStartPoints.get(currentLevel);
+
+        // Yeni level yüklendikten sonra spawn noktası:
+        Point startPoint = spawnPointManager.getSpawnPointForLevel(currentLevel);
         if (startPoint != null) {
             player.setLocation(startPoint.x, startPoint.y);
         }

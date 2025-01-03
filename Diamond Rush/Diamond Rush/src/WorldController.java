@@ -26,8 +26,12 @@ public class WorldController {
         soundManager.loadSound("gameMusic", "resources/gamemusic.wav");
         soundManager.playSound("gameMusic", true);
 
-        // WorldPanel’i lastLevel ile başlatıyoruz
-        worldPanel = new WorldPanel(soundManager, lastLevel);
+        // SpawnPointManager örneği oluşturulur ve varsayılan noktaları ekler
+        SpawnPointManager spawnPointManager = new SpawnPointManager();
+        spawnPointManager.initializeDefaultSpawnPoints();
+
+        // WorldPanel’i lastLevel ve spawnPointManager ile başlatıyoruz
+        worldPanel = new WorldPanel(soundManager, lastLevel, spawnPointManager);
 
         updateTimer = new Timer(16, new ActionListener() {
             @Override
@@ -39,6 +43,7 @@ public class WorldController {
         });
         updateTimer.start();
 
+        // Klavye olayları (Pause tuşu P)
         worldPanel.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
