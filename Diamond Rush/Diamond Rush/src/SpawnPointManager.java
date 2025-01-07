@@ -65,8 +65,8 @@ public class SpawnPointManager {
         // Örneğin 1. seviye için (600, 500),
         // 2. seviye için (3000, 500) vb. değerleri atayabilirsiniz.
         setSpawnPointForLevel(1, 600, 500);
-        setSpawnPointForLevel(2, 3000, 500);
-        setSpawnPointForLevel(3, 5000, 500);
-        setSpawnPointForLevel(4, 7500, 500);
+        setSpawnPointForLevel(2, 2500, 500);
+        setSpawnPointForLevel(3, 5000, 950);
+        setSpawnPointForLevel(4, 7500, 950);
     }
 }
