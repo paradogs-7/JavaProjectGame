@@ -28,7 +28,7 @@ public class MainMenu {
 
 
 
-    String CONTINUE_BUTON_YERI = "resources/PlayButton.jpg"; // KOYDUGUN BUTONUN RESMI BU YOLA YAPISTIR. TIRNAĞIN İÇİNE KOY
+    String CONTINUE_BUTON_YERI = "resources/ContinueButton.jpg"; // KOYDUGUN BUTONUN RESMI BU YOLA YAPISTIR. TIRNAĞIN İÇİNE KOY
     String NEW_GAME_BUTON_YERI = "resources/PlayButton.jpg";
 
 
