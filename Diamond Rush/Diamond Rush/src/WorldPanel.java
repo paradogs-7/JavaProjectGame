@@ -5,7 +5,17 @@ import java.awt.event.*;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+/*
 
+Ulaş Şahin — 220610027
+
+Volkan Yılmaz — 220610006
+
+Göktürk Can — 230611501
+
+Emirhan Keven — 220610037
+
+*/
 public class WorldPanel extends JPanel {
     private int worldWidth = 10800;
     private int worldHeight = 1080;

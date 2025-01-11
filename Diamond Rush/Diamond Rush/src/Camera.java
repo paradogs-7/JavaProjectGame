@@ -1,3 +1,15 @@
+/*
+
+Ulaş Şahin — 220610027
+
+Volkan Yılmaz — 220610006
+
+Göktürk Can — 230611501
+
+Emirhan Keven — 220610037
+
+*/
+
 public class Camera {
     private int x, y; // Kamera pozisyonu
     private int viewportWidth, viewportHeight; // Görünür alan (kamera genişliği ve yüksekliği)

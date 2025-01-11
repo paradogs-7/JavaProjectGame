@@ -1,7 +1,17 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+/*
 
+Ulaş Şahin — 220610027
+
+Volkan Yılmaz — 220610006
+
+Göktürk Can — 230611501
+
+Emirhan Keven — 220610037
+
+*/
 public class zGameController {
     private int score;
     private boolean isPaused;

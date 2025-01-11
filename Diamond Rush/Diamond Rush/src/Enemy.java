@@ -1,6 +1,17 @@
 import java.awt.*;
 import javax.swing.*;
 
+/*
+
+Ulaş Şahin — 220610027
+
+Volkan Yılmaz — 220610006
+
+Göktürk Can — 230611501
+
+Emirhan Keven — 220610037
+
+*/
 public class Enemy {
     private JLabel label;
     private GameObject object;

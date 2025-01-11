@@ -1,6 +1,17 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+
+Ulaş Şahin — 220610027
+
+Volkan Yılmaz — 220610006
+
+Göktürk Can — 230611501
+
+Emirhan Keven — 220610037
+
+*/
 public class ColliderSystem {
     private List<GameObject> colliders; // Çarpışma kontrolü yapılacak nesneler
 

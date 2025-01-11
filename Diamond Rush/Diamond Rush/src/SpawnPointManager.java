@@ -1,7 +1,17 @@
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
+/*
 
+Ulaş Şahin — 220610027
+
+Volkan Yılmaz — 220610006
+
+Göktürk Can — 230611501
+
+Emirhan Keven — 220610037
+
+*/
 public class SpawnPointManager {
 
     // Her seviyenin spawn noktalarını tutmak için bir Map kullanıyoruz
